@@ -3,7 +3,6 @@ package online.agatstudio.bootconfigdemo;
 import lombok.RequiredArgsConstructor;
 import online.agatstudio.bootconfigdemo.event.EventHolder;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 
@@ -13,7 +12,7 @@ import java.util.UUID;
 public class EventQueueWorker {
 
     private final EventQueue eventQueue;
-    private final ApplicationEventPublisher publisher;
+    private final ApplicationEventPublisher publisher; // отвечает за публикацию кастомного события в EventHolder
 
     @EventListener(ApplicationReadyEvent.class)
     // для того, чтобы метод вызвался сразу после загрузки контекста.
@@ -50,8 +49,7 @@ public class EventQueueWorker {
         Thread eventConsumerThread = new Thread(() -> {
             while (true) {
                 Event event = eventQueue.dequeue();
-//                System.out.println(event);
-                publisher.publishEvent(new EventHolder(this, event));
+                publisher.publishEvent(new EventHolder(this, event)); // публикует кастомное событие
             }
         });
         eventConsumerThread.start();
